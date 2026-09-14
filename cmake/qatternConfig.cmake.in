@@ -1,0 +1,10 @@
+@PACKAGE_INIT@
+
+# Header-only library whose exported target carries the GSL dependency, so the
+# package a consumer resolves must be the same flavour it was built against.
+include(CMakeFindDependencyMacro)
+find_dependency(Microsoft.GSL CONFIG)
+
+include("${CMAKE_CURRENT_LIST_DIR}/qatternTargets.cmake")
+
+check_required_components(qattern)

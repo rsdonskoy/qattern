@@ -1,0 +1,62 @@
+# Curated check set. WarningsAsErrors means CI fails on any diagnostic, so the
+# header filter must actually cover this repository: it is a header-only library
+# and a filter that matches nothing makes the whole gate silently pass.
+Checks: >
+  -*,
+  bugprone-*,
+  -bugprone-easily-swappable-parameters,
+  cppcoreguidelines-init-variables,
+  modernize-use-override,
+  performance-*,
+  readability-braces-around-statements,
+  readability-identifier-naming
+WarningsAsErrors: '*'
+# Match this project's own headers by file name: the separator differs between
+# shells, and filtering on an `include/` directory would also pull in GSL's
+# installed headers. Nothing here is checked without it, so a wrong pattern makes
+# the whole gate pass silently.
+HeaderFilterRegex: '[/\\\\]include[/\\\\](qattern|qchar|flat_)[^/\\\\]*\.hpp'
+CheckOptions:
+  - key: readability-identifier-naming.ClassCase
+    value: CamelCase
+  - key: readability-identifier-naming.StructCase
+    value: CamelCase
+  - key: readability-identifier-naming.FunctionCase
+    value: lower_case
+  # Methods are named explicitly rather than relying on FunctionCase reaching them.
+  - key: readability-identifier-naming.MethodCase
+    value: lower_case
+  - key: readability-identifier-naming.VariableCase
+    value: lower_case
+  - key: readability-identifier-naming.ParameterCase
+    value: lower_case
+  - key: readability-identifier-naming.PrivateMemberSuffix
+    value: '_'
+  # Constants that are named, not locals: only ConstexprVariable and GlobalConstant
+  # carry the k prefix. Setting the generic Constant style instead would also apply
+  # to local `const` bindings, which belong to VariableCase.
+  - key: readability-identifier-naming.ConstexprVariablePrefix
+    value: 'k'
+  - key: readability-identifier-naming.ConstexprVariableCase
+    value: CamelCase
+  - key: readability-identifier-naming.GlobalConstantPrefix
+    value: 'k'
+  - key: readability-identifier-naming.GlobalConstantCase
+    value: CamelCase
+  - key: readability-identifier-naming.EnumConstantPrefix
+    value: 'k'
+  - key: readability-identifier-naming.EnumConstantCase
+    value: CamelCase
+  - key: readability-identifier-naming.EnumClassCase
+    value: CamelCase
+  # No prefix required: include guards are macros and are legitimately prefix-free.
+  - key: readability-identifier-naming.MacroDefinitionCase
+    value: UPPER_CASE
+  - key: readability-identifier-naming.NamespaceCase
+    value: lower_case
+  - key: readability-identifier-naming.TypeAliasCase
+    value: CamelCase
+  - key: readability-identifier-naming.TemplateParameterCase
+    value: CamelCase
+  - key: readability-identifier-naming.UsingAliasCase
+    value: CamelCase
