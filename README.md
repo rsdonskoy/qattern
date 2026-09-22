@@ -52,7 +52,7 @@ Stateless. One back-to-front loop checks `is_allowed` and folds each unit into t
 
 | Offset | Size | Field | Constraint |
 |---|---|---|---|
-| 0 | 4 | magic | `'Q','G','D','F'` |
+| 0 | 4 | magic | `'Q','T','N','D'` |
 | 4 | 2 | version | must be 1 |
 | 6 | 1 | key_bytes | must equal `sizeof(qchar_type)` |
 | 7 | 1 | encoding | must equal `Traits::kEncoding` |

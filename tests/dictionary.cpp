@@ -144,9 +144,9 @@ static int run(int argc, char** argv)
     const auto count = static_cast<uint32_t>(ansi_keys.size());
     const std::vector<uint8_t> golden_header{
         0x51,
-        0x47,
-        0x44,
-        0x46, // 'Q','G','D','F'
+        0x54,
+        0x4E,
+        0x44, // 'Q','T','N','D'
         0x01,
         0x00,                               // version 1, little-endian
         0x04,                               // key_bytes = sizeof(uint32)

@@ -23,7 +23,7 @@ namespace qattern {
 // Only header and bytes are shared between the generated C++ array and a file on
 // disk, so one parse path validates either source.
 
-constexpr uint32_t kDictMagic = 0x46444751u; // 'Q','G','D','F'
+constexpr uint32_t kDictMagic = 0x444E5451u; // 'Q','T','N','D'
 constexpr uint16_t kDictVersion = 1;
 constexpr size_t kDictHeaderBytes = 16;
 
