@@ -7,6 +7,7 @@
 // Two more things are covered: case folding must let uppercase input hit a lowercase dictionary;
 // and the per-byte cost of the UTF-16LE(uint64) path, which has never been measured end to end.
 #include <qattern_dict.hpp>
+#include <qchar_scanner.hpp>
 
 #include <chrono>
 #include <cstdint>
@@ -76,7 +77,7 @@ template <typename Traits> int check_case_fold(const std::vector<typename Traits
 {
     auto lower = upper;
     for (auto& u : lower) {
-        u = static_cast<typename Traits::UnitType>(u + 0x20);
+        u = static_cast<Traits::UnitType>(u + 0x20);
     }
 
     // The dictionary holds only lowercase entries while the buffer is fed uppercase input; both

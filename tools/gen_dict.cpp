@@ -46,7 +46,7 @@ void write_bytes(const std::string& path, const std::vector<uint8_t>& bytes)
               static_cast<std::streamsize>(bytes.size()));
 }
 
-void write_header_file(const std::string& path, const std::string& symbol, size_t entry_count,
+void write_header_file(const std::string& path, const std::string& symbol, const size_t entry_count,
                        const std::vector<uint8_t>& bytes)
 {
     auto out = std::ofstream(path, std::ios::trunc);
@@ -79,7 +79,7 @@ void write_header_file(const std::string& path, const std::string& symbol, size_
 }
 
 template <typename Traits>
-int generate(const std::string& corpus_path, const std::string& out_path, bool as_binary,
+int generate(const std::string& corpus_path, const std::string& out_path, const bool as_binary,
              const std::string& symbol)
 {
     const auto loaded = corpus::load<Traits>(corpus_path);
@@ -116,9 +116,9 @@ int main(int argc, char** argv)
     }
 }
 
-static int run(int argc, char** argv)
+static int run(const int argc, char** argv)
 {
-    auto args = std::vector<std::string>(argv + 1, argv + argc);
+    const auto args = std::vector<std::string>(argv + 1, argv + argc);
     auto as_binary = false;
     auto symbol = std::string{};
     auto positional = std::vector<std::string>{};

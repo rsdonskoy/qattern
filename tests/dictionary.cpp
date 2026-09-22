@@ -6,6 +6,7 @@
 // Assert the error kind rather than merely "threw", because the whole point of the format is to
 // turn silent errors like feeding the wrong dictionary into a loud failure.
 #include <qattern_dict.hpp>
+#include <qchar_scanner.hpp>
 
 #include <cstdint>
 #include <cstdio>
@@ -21,7 +22,7 @@ namespace {
 
 int failures = 0;
 
-void expect(bool ok, const char* what)
+void expect(const bool ok, const char* what)
 {
     if (!ok) {
         std::printf("  FAIL %s\n", what);
@@ -31,7 +32,7 @@ void expect(bool ok, const char* what)
 
 template <typename Traits> void check_round_trip(const std::string& path)
 {
-    using Key = typename Traits::QCharType;
+    using Key = Traits::QCharType;
     const std::string name = Traits::kName;
     const auto loaded = corpus::load<Traits>(path);
     const auto keys = build_dictionary<Traits>(loaded.entries);

@@ -1,7 +1,6 @@
 #ifndef QCHAR_SCANNER_HPP
 #define QCHAR_SCANNER_HPP
 
-#include <cstddef>
 #include <cstdint>
 #include <iterator>
 #include <optional>
@@ -10,7 +9,6 @@
 #include <gsl/gsl>
 
 #include "flat_hash_set.hpp"
-#include "qchar_traits.hpp"
 
 namespace qattern {
 
@@ -28,9 +26,9 @@ template <typename QCharType> struct SearchResult {
 // dictionary or returns a skip that jumps past the rightmost out-of-range unit.
 // There is no rolling state, so a caller that skips positions never desyncs.
 template <typename Traits> class QcharScanner {
-  public:
-    using QCharType = typename Traits::QCharType;
-    using UnitType = typename Traits::UnitType;
+public:
+    using QCharType = Traits::QCharType;
+    using UnitType = Traits::UnitType;
 
     explicit QcharScanner(gsl::span<const QCharType> keys);
 
@@ -41,7 +39,7 @@ template <typename Traits> class QcharScanner {
     [[nodiscard]] SearchResult<QCharType> search_at(size_t offset);
 
     // Adaptor for callers that drive the scan with span iterators.
-    [[nodiscard]] SearchResult<QCharType> search(gsl::span<const uint8_t>::iterator& it);
+    [[nodiscard]] SearchResult<QCharType> search(gsl::span<const uint8_t>::iterator it);
 
     // Convenience: does a dictionary window end here? Used by the self tests.
     [[nodiscard]] bool contains_window_at(size_t offset) const noexcept;
@@ -51,7 +49,7 @@ template <typename Traits> class QcharScanner {
         return dictionary_;
     }
 
-  private:
+private:
     static constexpr size_t kByteWidth = sizeof(UnitType);
     static constexpr size_t kWindowBytes = Traits::kUnits * kByteWidth;
 
@@ -72,8 +70,7 @@ template <typename Traits> void QcharScanner<Traits>::set_buffer(gsl::span<const
 }
 
 template <typename Traits>
-typename QcharScanner<Traits>::UnitType
-QcharScanner<Traits>::unit_at(const size_t offset) const noexcept
+QcharScanner<Traits>::UnitType QcharScanner<Traits>::unit_at(const size_t offset) const noexcept
 {
     return Traits::read_unit(buffer_, offset);
 }
@@ -102,7 +99,7 @@ bool QcharScanner<Traits>::contains_window_at(const size_t offset) const noexcep
 
 template <typename Traits>
 SearchResult<typename Traits::QCharType>
-QcharScanner<Traits>::search(gsl::span<const uint8_t>::iterator& it)
+QcharScanner<Traits>::search(gsl::span<const uint8_t>::iterator it)
 {
     const auto offset = static_cast<size_t>(std::distance(buffer_.begin(), it));
     if (offset + 1 > buffer_.size()) {
