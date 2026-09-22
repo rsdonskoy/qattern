@@ -105,15 +105,15 @@ inline std::vector<uint16_t> decode_units(const std::string& s)
 // CP936 is GBK, a superset of GB2312: characters outside GB2312 encode to lead
 // bytes below 0xA1, which the GB2312 gate rejects. Such entries are reported as
 // unrepresentable rather than smuggled into the dictionary.
-inline std::vector<uint16_t> to_gb2312(const std::vector<uint16_t>& codePoints)
+inline std::vector<uint16_t> to_gb2312(const std::vector<uint16_t>& code_points)
 {
 #ifdef _WIN32
-    const auto wide = std::wstring(codePoints.begin(), codePoints.end());
-    auto bytes = std::vector<char>(codePoints.size() * 2, '\0');
+    const auto wide = std::wstring(code_points.begin(), code_points.end());
+    auto bytes = std::vector<char>(code_points.size() * 2, '\0');
     const auto written =
         WideCharToMultiByte(936, WC_NO_BEST_FIT_CHARS, wide.c_str(), static_cast<int>(wide.size()),
                             bytes.data(), static_cast<int>(bytes.size()), nullptr, nullptr);
-    if (written != static_cast<int>(codePoints.size() * 2)) {
+    if (written != static_cast<int>(code_points.size() * 2)) {
         return {};
     }
     auto units = std::vector<uint16_t>{};
@@ -155,8 +155,7 @@ template <typename Traits> Loaded<Traits> load(const std::string& path)
             if (line.size() == Traits::kUnits) {
                 auto units = std::vector<typename Traits::UnitType>{};
                 for (const auto c : line) {
-                    units.push_back(
-                        static_cast<typename Traits::UnitType>(static_cast<unsigned char>(c)));
+                    units.push_back(static_cast<Traits::UnitType>(static_cast<unsigned char>(c)));
                 }
                 result.entries.push_back(std::move(units));
             } else {
@@ -165,21 +164,21 @@ template <typename Traits> Loaded<Traits> load(const std::string& path)
             continue;
         }
 
-        auto codePoints = decode_units(line);
-        if (codePoints.size() != Traits::kUnits) {
+        auto code_points = decode_units(line);
+        if (code_points.size() != Traits::kUnits) {
             ++result.skipped;
             continue;
         }
 
         auto source = std::vector<uint16_t>{};
         if constexpr (Traits::kEncoding == Encoding::kGb2312) {
-            source = to_gb2312(codePoints);
+            source = to_gb2312(code_points);
             if (source.size() != Traits::kUnits) {
                 ++result.skipped;
                 continue;
             }
         } else {
-            source = std::move(codePoints);
+            source = std::move(code_points);
         }
 
         // Explicitly convert to this policy's unit type: non-dependent expressions in discarded
@@ -187,7 +186,7 @@ template <typename Traits> Loaded<Traits> load(const std::string& path)
         // compile for a uint8_t-unit policy.
         auto units = std::vector<typename Traits::UnitType>{};
         for (const auto value : source) {
-            units.push_back(static_cast<typename Traits::UnitType>(value));
+            units.push_back(static_cast<Traits::UnitType>(value));
         }
         result.entries.push_back(std::move(units));
     }

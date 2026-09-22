@@ -4,7 +4,6 @@
 #include <algorithm>
 #include <array>
 #include <concepts>
-#include <cstddef>
 #include <cstdint>
 #include <limits>
 #include <stdexcept>
@@ -31,7 +30,7 @@ namespace qattern {
 // binary search costs 13-30% more, because a gate in front of the lookup has
 // already removed the positions that would never match.
 template <std::unsigned_integral KeyType> class FlatHashSet {
-  public:
+public:
     FlatHashSet() = default;
 
     explicit FlatHashSet(gsl::span<const KeyType> keys)
@@ -105,10 +104,10 @@ template <std::unsigned_integral KeyType> class FlatHashSet {
         return slots_.size() * sizeof(KeyType);
     }
 
-  private:
+private:
     static KeyType pick_empty(gsl::span<const KeyType> keys);
 
-    void reserve(size_t wanted)
+    void reserve(const size_t wanted)
     {
         auto bits = size_t{4};
         while ((size_t{1} << bits) < wanted * 2) {

@@ -8,7 +8,6 @@
 
 #include <gsl/gsl>
 
-#include "qchar_scanner.hpp"
 #include "qchar_traits.hpp"
 
 namespace qattern {
@@ -24,7 +23,7 @@ namespace qattern {
 // Only header and bytes are shared between the generated C++ array and a file on
 // disk, so one parse path validates either source.
 
-constexpr uint32_t kDictMagic = 0x46444751u; // 'Q','G','D','F'
+constexpr uint32_t kDictMagic = 0x444E5451u; // 'Q','T','N','D'
 constexpr uint16_t kDictVersion = 1;
 constexpr size_t kDictHeaderBytes = 16;
 
@@ -88,12 +87,12 @@ inline void append_u32(std::vector<uint8_t>& out, const uint32_t value)
 // The value is folded so upper-case corpus entries collapse onto what a scan can
 // actually report.
 template <typename Traits>
-typename Traits::QCharType pack_units(const std::vector<typename Traits::UnitType>& units)
+Traits::QCharType pack_units(const std::vector<typename Traits::UnitType>& units)
 {
-    auto key = static_cast<typename Traits::QCharType>(0);
+    auto key = static_cast<Traits::QCharType>(0);
     for (const auto unit : units) {
-        key = static_cast<typename Traits::QCharType>(
-            (key << (8 * sizeof(typename Traits::UnitType))) | Traits::fold(unit));
+        key = static_cast<Traits::QCharType>((key << (8 * sizeof(typename Traits::UnitType))) |
+                                             Traits::fold(unit));
     }
     return key;
 }
@@ -137,7 +136,7 @@ void append_units(std::vector<uint8_t>& buf, const std::vector<typename Traits::
 template <typename Traits>
 std::vector<uint8_t> write_dictionary(const std::vector<typename Traits::QCharType>& keys)
 {
-    using KeyType = typename Traits::QCharType;
+    using KeyType = Traits::QCharType;
 
     const auto header = DictHeader{
         .version = kDictVersion,
@@ -186,7 +185,7 @@ enum class DictError : std::uint8_t {
 };
 
 [[nodiscard]]
-inline const char* dict_message(DictError e) noexcept
+inline const char* dict_message(const DictError e) noexcept
 {
     switch (e) {
     case DictError::kTooSmall:
@@ -216,8 +215,8 @@ inline const char* dict_message(DictError e) noexcept
 }
 
 class DictException : public std::runtime_error {
-  public:
-    explicit DictException(DictError e)
+public:
+    explicit DictException(const DictError e)
         : std::runtime_error(std::string("qattern dictionary: ") + dict_message(e)), error_(e)
     {
     }
@@ -228,7 +227,7 @@ class DictException : public std::runtime_error {
         return error_;
     }
 
-  private:
+private:
     DictError error_;
 };
 
@@ -238,7 +237,7 @@ class DictException : public std::runtime_error {
 template <typename Traits>
 std::vector<typename Traits::QCharType> read_dictionary(gsl::span<const uint8_t> blob)
 {
-    using KeyType = typename Traits::QCharType;
+    using KeyType = Traits::QCharType;
 
     if (blob.size() < kDictHeaderBytes) {
         throw DictException(DictError::kTooSmall);
